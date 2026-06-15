@@ -7,9 +7,16 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // https://vite.dev/config/
 export default defineConfig({
   server: {
+    host: true,
     port: 8000,
     allowedHosts: ['abzabza.ru'],
-    watch: { usePolling: true }
+    watch: { usePolling: true },
+    proxy: {
+      '/api': {
+        target: 'http://backend:8080',
+        changeOrigin: true,
+      },
+    },
   },
   plugins: [
     vue(),

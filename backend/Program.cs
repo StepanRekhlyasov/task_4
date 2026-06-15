@@ -54,7 +54,7 @@ api.MapPost("/send-email", async (SendEmailRequest request, IConfiguration confi
 
 api.MapGet("/users", () =>
 {
-    return Results.Json(new { users = new[] { "user1s", "user2", "user3" } });
+    return Results.Json(new { users = new[] { "user1", "user2", "user3" } });
 });
 
 Console.WriteLine("Сервер запущен: http://localhost:8080/");

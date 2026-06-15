@@ -1,10 +1,16 @@
 # Vue 3
-FROM node:20-alpine AS build-stage
+FROM node:20-alpine AS base
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
+FROM base AS build-stage
 RUN npm run build
+
+FROM base AS dev-stage
+EXPOSE 80
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "80"]
 
 # Nginx
 FROM nginx:stable-alpine AS production-stage
