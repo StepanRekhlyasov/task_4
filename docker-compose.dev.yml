@@ -39,6 +39,9 @@ services:
   frontend:
     build:
       context: ./frontend
+    volumes:
+      - ./frontend:/app
+      - ./frontend/node_modules:/app/node_modules
     develop:
       watch:
         - action: rebuild
@@ -51,6 +54,7 @@ services:
     depends_on:
       - backend
       - phpmyadmin
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
   
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

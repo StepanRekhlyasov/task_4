@@ -8,7 +8,8 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   server: {
     port: 8000,
-    allowedHosts: ['*']
+    allowedHosts: ['abzabza.ru'],
+    watch: { usePolling: true }
   },
   plugins: [
     vue(),

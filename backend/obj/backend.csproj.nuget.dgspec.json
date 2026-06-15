@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Code\\itransition\\camp\\task4\\backend\\backend.csproj": {}
+    "/app/backend.csproj": {}
   },
   "projects": {
-    "C:\\Code\\itransition\\camp\\task4\\backend\\backend.csproj": {
+    "/app/backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Code\\itransition\\camp\\task4\\backend\\backend.csproj",
+        "projectUniqueName": "/app/backend.csproj",
         "projectName": "backend",
-        "projectPath": "C:\\Code\\itransition\\camp\\task4\\backend\\backend.csproj",
-        "packagesPath": "C:\\Users\\srekh\\.nuget\\packages\\",
-        "outputPath": "C:\\Code\\itransition\\camp\\task4\\backend\\obj\\",
+        "projectPath": "/app/backend.csproj",
+        "packagesPath": "/root/.nuget/packages/",
+        "outputPath": "/app/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\srekh\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/root/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -49,6 +49,14 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[10.0.9, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[10.0.9, )"
+            },
+            "Microting.EntityFrameworkCore.MySql": {
+              "target": "Package",
+              "version": "[10.0.8, )"
             }
           },
           "imports": [
@@ -70,7 +78,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.301/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
