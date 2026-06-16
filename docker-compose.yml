@@ -10,10 +10,8 @@ services:
       MYSQL_PASSWORD: app
     ports:
       - "3306:3306"
-    command: --init-file=/init.sql
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init.sql:/init.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uapp", "-papp"]
       interval: 5s
@@ -24,10 +22,6 @@ services:
     build:
       context: ./backend
       target: ${APP_MODE:-dev-stage}
-    volumes:
-      - ./backend:/app
-      - backend_obj:/app/obj
-      - backend_bin:/app/bin
     develop:
       watch: 
       - action: rebuild
@@ -39,7 +33,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
       - DOTNET_USE_POLLING_FILE_WATCHER=true
-      - ConnectionStrings__Default=Server=mysql;Port=3306;Database=task4;User=app;Password=app;
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=task4;User=app;Password=app;
     depends_on:
       mysql:
         condition: service_healthy
