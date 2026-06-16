@@ -4,7 +4,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vite.dev/config/
 export default defineConfig({
   server: {
     host: true,
@@ -15,6 +14,11 @@ export default defineConfig({
       '/api': {
         target: 'http://backend:8080',
         changeOrigin: true,
+      },
+      '/phpmyadmin': {
+        target: 'http://phpmyadmin:80',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/phpmyadmin\/?/, '/'),
       },
     },
   },

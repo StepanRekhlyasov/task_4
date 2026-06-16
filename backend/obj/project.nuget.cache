@@ -1,17 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "eTk2VzhukrM=",
+  "dgSpecHash": "40pw+m22koU=",
   "success": true,
-  "projectFilePath": "/app/backend.csproj",
+  "projectFilePath": "C:\\Code\\itransition\\camp\\task4\\backend\\backend.csproj",
   "expectedPackageFiles": [
-    "/root/.nuget/packages/microsoft.aspnetcore.openapi/10.0.9/microsoft.aspnetcore.openapi.10.0.9.nupkg.sha512",
-    "/root/.nuget/packages/microsoft.entityframeworkcore/10.0.9/microsoft.entityframeworkcore.10.0.9.nupkg.sha512",
-    "/root/.nuget/packages/microsoft.entityframeworkcore.abstractions/10.0.9/microsoft.entityframeworkcore.abstractions.10.0.9.nupkg.sha512",
-    "/root/.nuget/packages/microsoft.entityframeworkcore.analyzers/10.0.9/microsoft.entityframeworkcore.analyzers.10.0.9.nupkg.sha512",
-    "/root/.nuget/packages/microsoft.entityframeworkcore.relational/10.0.8/microsoft.entityframeworkcore.relational.10.0.8.nupkg.sha512",
-    "/root/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512",
-    "/root/.nuget/packages/microting.entityframeworkcore.mysql/10.0.8/microting.entityframeworkcore.mysql.10.0.8.nupkg.sha512",
-    "/root/.nuget/packages/mysqlconnector/2.5.0/mysqlconnector.2.5.0.nupkg.sha512"
+    "C:\\Users\\srekh\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.9\\microsoft.aspnetcore.openapi.10.0.9.nupkg.sha512",
+    "C:\\Users\\srekh\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
   ],
   "logs": []
 }

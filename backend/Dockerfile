@@ -1,20 +1,24 @@
-# Stage 1: Build the C# Application
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS base
 WORKDIR /app
-
-# Copy csproj and restore dependencies
 COPY *.csproj ./
 RUN dotnet restore
-
-# Copy remaining files and build release
 COPY . ./
+
+FROM base AS build-stage
 RUN dotnet publish -c Release -o out
 
-# Stage 2: Run the compiled API
+# FROM base AS dev-stage
+# EXPOSE 8080
+# CMD ["dotnet", "watch", "run", "--non-interactive", "--no-launch-profile"]
+
+# FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS production-stage
+# WORKDIR /app
+# COPY --from=build-stage /app/out .
+# EXPOSE 8080
+# ENTRYPOINT ["dotnet", "backend.dll"]
+
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
-COPY --from=build-env /app/out .
-
-# Expose API port
+COPY --from=build-stage /app/out .
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "backend.dll"]
