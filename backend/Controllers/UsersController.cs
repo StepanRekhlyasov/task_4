@@ -8,9 +8,9 @@ namespace backend.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly AuthDbContext dbContext;
 
-        public UsersController(ApplicationDbContext dbContext)
+        public UsersController(AuthDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
@@ -19,7 +19,20 @@ namespace backend.Controllers
         [Authorize]
         public IActionResult GetUsers()
         {
-            return Ok(dbContext.Users.ToList());
+            var users = dbContext.Users
+                .Select(user => new
+                {
+                    user.Id,
+                    user.Name,
+                    user.Email,
+                    user.IsActive,
+                    user.CreatedAt,
+                    user.UpdatedAt,
+                    user.LastActivityAt
+                })
+                .ToList();
+
+            return Ok(users);
         }
     }
 }

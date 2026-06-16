@@ -1,15 +1,13 @@
 using backend.Data;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Identity;
+using backend.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
+var mySqlVersion = new MySqlServerVersion(new Version(8, 0, 32));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => 
 {
@@ -28,19 +26,18 @@ builder.Services.AddSwaggerGen(options =>
         BearerFormat = "JWT",
         Scheme = "bearer"
     });
-    
+
     options.AddSecurityRequirement(document  => new OpenApiSecurityRequirement
     {
         [new OpenApiSecuritySchemeReference("bearer", document)] = []
     });
+
 });
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0, 32))));
-builder.Services.AddDbContext<AuthDbContext>(options => {
-    options.UseInMemoryDatabase("AuthDb");
-});
+builder.Services.AddDbContext<AuthDbContext>(options =>
+    options.UseMySql(connectionString, mySqlVersion));
 
-builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
+builder.Services.AddIdentityApiEndpoints<User>(options =>
 {
     options.Password.RequiredLength = 1;
     options.Password.RequireDigit = false;
@@ -52,9 +49,14 @@ builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
 
 var app = builder.Build();
 
-app.MapGroup("/api").MapIdentityApi<IdentityUser>();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+    db.Database.Migrate();
+}
 
-// Configure the HTTP request pipeline.
+app.MapGroup("/api").MapIdentityApi<User>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger(options =>
@@ -69,9 +71,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
