@@ -3,6 +3,7 @@ using backend.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -66,6 +67,28 @@ namespace backend.Controllers
             }
 
             return Ok();
+        }
+
+        [HttpDelete("users/unconfirmed")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUnconfirmedUsers()
+        {
+            var unconfirmedUsers = await dbContext.Users
+                .Where(user => !user.EmailConfirmed)
+                .ToListAsync();
+
+            var deletedCount = 0;
+
+            foreach (var user in unconfirmedUsers)
+            {
+                var result = await userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                {
+                    deletedCount++;
+                }
+            }
+
+            return Ok(new { deletedCount });
         }
     }
 }

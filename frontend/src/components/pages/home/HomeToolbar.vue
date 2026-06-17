@@ -1,5 +1,5 @@
 <template>
-  <div class="users-toolbar d-flex align-items-center gap-2 mb-3">
+  <div class="users-toolbar d-flex align-items-center gap-2 mb-3 justify-content-between">
     <div class="d-flex gap-2 align-items-center">
       <button
         type="button"
@@ -7,9 +7,7 @@
         :disabled="!canBlock || isProcessing"
         @click="blockSelected"
       >
-        <svg class="toolbar-icon" viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-        </svg>
+        <font-awesome-icon :icon="faLock" class="toolbar-icon"/>
         Block
       </button>
       <button
@@ -18,27 +16,35 @@
         :disabled="!canUnblock || isProcessing"
         @click="unblockSelected"
       >
-        <svg class="toolbar-icon" viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 1 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2z" />
-        </svg>
-        Unblock
+        <font-awesome-icon :icon="faUnlock" class="toolbar-icon"/>
       </button>
       {{ selectedIds.length }} selected
     </div>
 
-    <div class="search-field ms-auto">
-      <svg class="search-icon" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242 1.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
-      </svg>
-      <input
-        v-model.trim="filterString"
-        type="search"
-        class="form-control search-input"
-        placeholder="Search by name or email"
-        aria-label="Search users by name or email"
-      />
+    <div class="d-flex gap-2 align-items-center">
+        <button
+            type="button"
+            class="btn btn-outline-warning d-inline-flex align-items-center gap-2"
+            :disabled="!hasUnconfirmedUsers || isProcessing"
+            title="Delete all users with unverified email"
+            aria-label="Delete all users with unverified email"
+            @click="deleteUnconfirmed"
+        >
+        <font-awesome-icon :icon="faTrash" class="toolbar-icon"/>
+        </button>
+        <div class="search-field ms-auto">
+            <font-awesome-icon :icon="faSearch" class="search-icon"/>
+            <input
+                v-model.trim="filterString"
+                type="search"
+                class="form-control search-input"
+                placeholder="Search by name or email"
+                aria-label="Search users by name or email"
+                style="min-width: 240px;"
+            />
+        </div>
     </div>
-  </div>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -46,6 +52,8 @@ import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { toast } from 'vue3-toastify'
 import { useUsersStore } from '@/stores/users'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faLock, faUnlock, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons'
 
 const usersStore = useUsersStore()
 const { users } = storeToRefs(usersStore)
@@ -64,6 +72,10 @@ const canBlock = computed(() =>
 
 const canUnblock = computed(() =>
   selectedUsers.value.some((user) => !user.isActive),
+)
+
+const hasUnconfirmedUsers = computed(() =>
+  users.value.some((user) => !user.emailConfirmed),
 )
 
 async function blockSelected() {
@@ -95,12 +107,36 @@ async function unblockSelected() {
     isProcessing.value = false
   }
 }
+
+async function deleteUnconfirmed() {
+  if (!hasUnconfirmedUsers.value) return
+
+  const confirmed = window.confirm('Delete all users with unverified email?')
+  if (!confirmed) return
+
+  isProcessing.value = true
+  try {
+    const deletedCount = await usersStore.deleteUnconfirmedUsers()
+    toast.success(
+      deletedCount === 1
+        ? '1 unverified user deleted.'
+        : `${deletedCount} unverified users deleted.`,
+    )
+    selectedIds.value = []
+    await usersStore.fetchUsers()
+  } finally {
+    isProcessing.value = false
+  }
+}
 </script>
 
 <style scoped lang="scss">
 .users-toolbar {
   .btn:disabled {
     opacity: 0.55;
+  }
+  .btn, input {
+    height: 42px;
   }
 }
 
