@@ -1,5 +1,5 @@
 .vs/
 .backend_obj/
 .backend_bin/
-.obj/
-.bin/
+/obj/
+/bin/
