@@ -169,6 +169,8 @@ async function handleSubmit() {
   isSubmitting.value = true
   try {
     await props.config.onSubmit(getFormValues())
+  } catch (error) {
+    console.error(error)
   } finally {
     isSubmitting.value = false
   }

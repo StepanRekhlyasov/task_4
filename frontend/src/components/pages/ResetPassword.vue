@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import AuthForm, { type FormConfig } from '@/components/widget/Form.vue'
+import AuthForm, { type FormConfig } from '@/components/widgets/Form.vue'
 import { useAuthStore } from '@/stores/auth'
 import { toast } from 'vue3-toastify'
 import router from '@/router'
