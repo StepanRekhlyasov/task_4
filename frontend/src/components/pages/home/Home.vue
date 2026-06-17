@@ -1,8 +1,8 @@
 <template>
   <app-layout>
     <div class="container-fluid px-4">
-      <home-toolbar v-model:selected-ids="selectedIds" />
-      <home-table v-model:selected-ids="selectedIds" />
+      <home-toolbar v-model:selected-ids="selectedIds" v-model:filter-string="filterString"/>
+      <home-table v-model:selected-ids="selectedIds" v-model:filter-string="filterString"/>
     </div>
   </app-layout>
 </template>
@@ -13,6 +13,7 @@ import { AppLayout } from '@/components/layouts'
 import { ref } from 'vue'
 
 const selectedIds = ref<string[]>([])
+const filterString = ref<string>('')
 </script>
 
 <style scoped lang="scss">

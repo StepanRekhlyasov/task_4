@@ -21,10 +21,12 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-if="usersStore.users.length === 0">
-            <td colspan="6" class="text-center text-muted py-4">No users found.</td>
+            <tr v-if="filteredUsers.length === 0">
+            <td colspan="6" class="text-center text-muted py-4">
+                {{ users.length === 0 ? 'No users found.' : 'No users match your search.' }}
+            </td>
             </tr>
-            <tr v-for="user in usersStore.users" :key="user.id">
+            <tr v-for="user in filteredUsers" :key="user.id">
             <td class="checkbox-col">
                 <input
                 class="form-check-input"
@@ -67,15 +69,29 @@
     const { users } = storeToRefs(usersStore)
     
     const selectedIds = defineModel<string[]>('selectedIds', { required: true })
+    const filterString = defineModel<string>('filterString', { required: true })
     const selectAllCheckbox = ref<HTMLInputElement | null>(null)
+
+    const filteredUsers = computed(() => {
+        const query = filterString.value.trim().toLowerCase()
+        if (!query) return users.value
+
+        return users.value.filter((user) =>
+            user.name.toLowerCase().includes(query) ||
+            user.email.toLowerCase().includes(query),
+        )
+    })
         
     const allSelected = computed(
-        () => users.value.length > 0 && users.value.every((user) => selectedIds.value.includes(user.id)),
+        () => filteredUsers.value.length > 0 &&
+            filteredUsers.value.every((user) => selectedIds.value.includes(user.id)),
     )
     
     const someSelected = computed(() => {
-        const selectedCount = users.value.filter((user) => selectedIds.value.includes(user.id)).length
-        return selectedCount > 0 && selectedCount < users.value.length
+        const selectedCount = filteredUsers.value
+            .filter((user) => selectedIds.value.includes(user.id))
+            .length
+        return selectedCount > 0 && selectedCount < filteredUsers.value.length
     })
     
     watch([someSelected, allSelected], () => {
@@ -92,11 +108,17 @@
         const checked = (event.target as HTMLInputElement).checked
     
         if (checked) {
-        selectedIds.value = users.value.map((user) => user.id)
+        selectedIds.value = [
+            ...new Set([
+                ...selectedIds.value,
+                ...filteredUsers.value.map((user) => user.id),
+            ]),
+        ]
         return
         }
     
-        selectedIds.value = []
+        const filteredIds = new Set(filteredUsers.value.map((user) => user.id))
+        selectedIds.value = selectedIds.value.filter((id) => !filteredIds.has(id))
     }
     
     function toggleUser(id: string, checked: boolean) {
