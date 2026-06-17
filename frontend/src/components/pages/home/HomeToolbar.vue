@@ -29,6 +29,15 @@
       >
         <font-awesome-icon :icon="faTrash" class="toolbar-icon"/>
       </button>
+      <button
+        type="button"
+        class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"
+        :disabled="!canResend || isProcessing"
+        :title="canResend ? `Resend confirmation email to ${canResend} users` : 'No unverified users selected'"
+        @click="resendConfirmationSelected"
+      >
+        <font-awesome-icon :icon="faEnvelope" class="toolbar-icon"/>
+      </button>
       {{ selectedIds.length }} selected
     </div>
 
@@ -63,7 +72,7 @@ import { storeToRefs } from 'pinia'
 import { toast } from 'vue3-toastify'
 import { useUsersStore } from '@/stores/users'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faLock, faUnlock, faTrash, faSearch, faBroom } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faUnlock, faTrash, faSearch, faBroom, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 
 const usersStore = useUsersStore()
 const { users } = storeToRefs(usersStore)
@@ -89,6 +98,10 @@ const canClean = computed(() =>
 )
 
 const canDelete = computed(() => selectedIds.value.length)
+
+const canResend = computed(() =>
+  selectedUsers.value.filter((user) => !user.emailConfirmed).length,
+)
 
 async function blockSelected() {
   const usersToBlock = selectedUsers.value.filter((user) => user.isActive)
@@ -149,6 +162,25 @@ async function deleteSelected() {
     toast.success(count === 1 ? 'User deleted.' : `${count} users deleted.`)
     selectedIds.value = []
     await usersStore.fetchUsers()
+  } finally {
+    isProcessing.value = false
+  }
+}
+
+async function resendConfirmationSelected() {
+  const usersToResend = selectedUsers.value.filter((user) => !user.emailConfirmed)
+  if (usersToResend.length === 0) return
+
+  isProcessing.value = true
+  try {
+    await Promise.all(
+      usersToResend.map((user) => usersStore.resendConfirmationEmail(user.email)),
+    )
+    toast.success(
+      usersToResend.length === 1
+        ? 'Confirmation email sent.'
+        : `Confirmation emails sent to ${usersToResend.length} users.`,
+    )
   } finally {
     isProcessing.value = false
   }

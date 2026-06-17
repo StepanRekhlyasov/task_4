@@ -34,5 +34,16 @@ export const useUsersStore = defineStore('users', () => {
     await api.delete(`users/${id}`)
   }
 
-  return { users, fetchUsers, setUserBlocked, deleteUnconfirmedUsers, deleteUser }
+  async function resendConfirmationEmail(email: string) {
+    await api.post('resendConfirmationEmail', { email })
+  }
+
+  return {
+    users,
+    fetchUsers,
+    setUserBlocked,
+    deleteUnconfirmedUsers,
+    deleteUser,
+    resendConfirmationEmail,
+  }
 })
