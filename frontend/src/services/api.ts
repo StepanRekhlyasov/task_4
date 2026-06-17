@@ -31,10 +31,14 @@ api.interceptors.response.use(response => {
     return response
 },
 error => {
-    if (error.response?.status === 401 && router.currentRoute.value.name !== 'login') {
+    if ([401, 403].includes(error.response?.status) && router.currentRoute.value.name !== 'login') {
         router.push('/login')
         localStorage.removeItem('access_token')
-        toast.error('Session expired. Please login again.')
+        toast.error(
+            error.response?.status === 403
+                ? 'Account is blocked.'
+                : 'Session expired. Please login again.',
+        )
         return Promise.reject(error)
     }
     if (axios.isAxiosError(error)) {

@@ -1,20 +1,15 @@
 ﻿using backend.Data;
+using backend.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
     [ApiController]
     [Route("api")]
-    public class UsersController : ControllerBase
+    public class UsersController(AuthDbContext dbContext, UserManager<User> userManager) : ControllerBase
     {
-        private readonly AuthDbContext dbContext;
-
-        public UsersController(AuthDbContext dbContext)
-        {
-            this.dbContext = dbContext;
-        }
-
         [HttpGet("users")]
         [Authorize]
         public IActionResult GetUsers()
@@ -33,6 +28,43 @@ namespace backend.Controllers
                 .ToList();
 
             return Ok(users);
+        }
+
+        [HttpPost("users/{id}/block")]
+        [Authorize]
+        public async Task<IActionResult> BlockUser(string id, bool isBlocked)
+        {
+            var user = await userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (isBlocked != user.IsActive)
+            {
+                return Conflict(new { error = "User is already " + (isBlocked ? "blocked" : "unblocked") + "." });
+            }
+
+            user.IsActive = !isBlocked;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await userManager.SetLockoutEnabledAsync(user, isBlocked);
+            await userManager.SetLockoutEndDateAsync(user, isBlocked ? DateTimeOffset.MaxValue : null);
+
+            var result = await userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return ValidationProblem(new ValidationProblemDetails
+                {
+                    Errors = result.Errors
+                        .GroupBy(error => error.Code)
+                        .ToDictionary(
+                            group => group.Key,
+                            group => group.Select(error => error.Description).ToArray())
+                });
+            }
+
+            return Ok();
         }
     }
 }

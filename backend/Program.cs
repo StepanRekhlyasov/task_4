@@ -1,6 +1,8 @@
+using backend.Authorization;
 using backend.Data;
 using backend.Models.Entities;
 using backend.Models.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
@@ -55,6 +57,17 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
     options.Lockout.MaxFailedAccessAttempts = 0; 
 })
 .AddEntityFrameworkStores<AuthDbContext>();
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("ActiveUser", policy =>
+        policy.RequireAuthenticatedUser()
+            .AddRequirements(new ActiveUserRequirement()))
+    .SetDefaultPolicy(new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .AddRequirements(new ActiveUserRequirement())
+        .Build());
+
+builder.Services.AddScoped<IAuthorizationHandler, ActiveUserHandler>();
 
 builder.Services.AddTransient<IEmailSender<User>, EmailSender>();
 
