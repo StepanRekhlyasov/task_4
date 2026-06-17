@@ -30,5 +30,9 @@ export const useUsersStore = defineStore('users', () => {
     return response.data.deletedCount
   }
 
-  return { users, fetchUsers, setUserBlocked, deleteUnconfirmedUsers }
+  async function deleteUser(id: string) {
+    await api.delete(`users/${id}`)
+  }
+
+  return { users, fetchUsers, setUserBlocked, deleteUnconfirmedUsers, deleteUser }
 })

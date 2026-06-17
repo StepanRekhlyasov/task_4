@@ -6,6 +6,7 @@
         class="btn btn-outline-danger d-inline-flex align-items-center gap-2"
         :disabled="!canBlock || isProcessing"
         @click="blockSelected"
+        :title="canBlock ? `Block ${canBlock} active users` : 'No active users found'"
       >
         <font-awesome-icon :icon="faLock" class="toolbar-icon"/>
         Block
@@ -14,9 +15,19 @@
         type="button"
         class="btn btn-outline-primary d-inline-flex align-items-center gap-2"
         :disabled="!canUnblock || isProcessing"
+        :title="canUnblock ? `Unblock ${canUnblock} blocked users` : 'No blocked users found'"
         @click="unblockSelected"
       >
         <font-awesome-icon :icon="faUnlock" class="toolbar-icon"/>
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-danger d-inline-flex align-items-center gap-2"
+        :disabled="!canDelete || isProcessing"
+        :title="canDelete ? `Delete ${canDelete} selected users` : 'No users selected'"
+        @click="deleteSelected"
+      >
+        <font-awesome-icon :icon="faTrash" class="toolbar-icon"/>
       </button>
       {{ selectedIds.length }} selected
     </div>
@@ -25,12 +36,11 @@
         <button
             type="button"
             class="btn btn-outline-warning d-inline-flex align-items-center gap-2"
-            :disabled="!hasUnconfirmedUsers || isProcessing"
-            title="Delete all users with unverified email"
-            aria-label="Delete all users with unverified email"
+            :disabled="!canClean || isProcessing"
+            :title="canClean ? `Delete ${canClean} unverified users` : 'No unverified users found'"
             @click="deleteUnconfirmed"
         >
-        <font-awesome-icon :icon="faTrash" class="toolbar-icon"/>
+        <font-awesome-icon :icon="faBroom" class="toolbar-icon"/>
         </button>
         <div class="search-field ms-auto">
             <font-awesome-icon :icon="faSearch" class="search-icon"/>
@@ -53,7 +63,7 @@ import { storeToRefs } from 'pinia'
 import { toast } from 'vue3-toastify'
 import { useUsersStore } from '@/stores/users'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faLock, faUnlock, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faUnlock, faTrash, faSearch, faBroom } from '@fortawesome/free-solid-svg-icons'
 
 const usersStore = useUsersStore()
 const { users } = storeToRefs(usersStore)
@@ -67,16 +77,18 @@ const selectedUsers = computed(() =>
 )
 
 const canBlock = computed(() =>
-  selectedUsers.value.some((user) => user.isActive),
+  selectedUsers.value.filter((user) => user.isActive)?.length,
 )
 
 const canUnblock = computed(() =>
-  selectedUsers.value.some((user) => !user.isActive),
+  selectedUsers.value.filter((user) => !user.isActive)?.length,
 )
 
-const hasUnconfirmedUsers = computed(() =>
-  users.value.some((user) => !user.emailConfirmed),
+const canClean = computed(() =>
+  users.value.filter((user) => !user.emailConfirmed)?.length,
 )
+
+const canDelete = computed(() => selectedIds.value.length)
 
 async function blockSelected() {
   const usersToBlock = selectedUsers.value.filter((user) => user.isActive)
@@ -109,10 +121,7 @@ async function unblockSelected() {
 }
 
 async function deleteUnconfirmed() {
-  if (!hasUnconfirmedUsers.value) return
-
-  const confirmed = window.confirm('Delete all users with unverified email?')
-  if (!confirmed) return
+  if (!canClean.value) return
 
   isProcessing.value = true
   try {
@@ -122,6 +131,22 @@ async function deleteUnconfirmed() {
         ? '1 unverified user deleted.'
         : `${deletedCount} unverified users deleted.`,
     )
+    selectedIds.value = []
+    await usersStore.fetchUsers()
+  } finally {
+    isProcessing.value = false
+  }
+}
+
+async function deleteSelected() {
+  if (!canDelete.value) return
+
+  const count = selectedUsers.value.length
+
+  isProcessing.value = true
+  try {
+    await Promise.all(selectedUsers.value.map((user) => usersStore.deleteUser(user.id)))
+    toast.success(count === 1 ? 'User deleted.' : `${count} users deleted.`)
     selectedIds.value = []
     await usersStore.fetchUsers()
   } finally {

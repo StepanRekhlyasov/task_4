@@ -69,6 +69,32 @@ namespace backend.Controllers
             return Ok();
         }
 
+        [HttpDelete("users/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                return ValidationProblem(new ValidationProblemDetails
+                {
+                    Errors = result.Errors
+                        .GroupBy(error => error.Code)
+                        .ToDictionary(
+                            group => group.Key,
+                            group => group.Select(error => error.Description).ToArray())
+                });
+            }
+
+            return Ok();
+        }
+
         [HttpDelete("users/unconfirmed")]
         [Authorize]
         public async Task<IActionResult> DeleteUnconfirmedUsers()
