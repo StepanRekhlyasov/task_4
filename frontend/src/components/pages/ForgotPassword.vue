@@ -9,7 +9,7 @@ import { toast } from 'vue3-toastify'
 
 const config: FormConfig = {
   title: 'Forgot password?',
-  description: 'Enter your email to receive a password reset link.',
+  description: 'Your email should be verified to receive a password reset link.',
   fields: [
     {
       name: 'email',

@@ -20,6 +20,7 @@ namespace backend.Controllers
                     user.Id,
                     user.Name,
                     user.Email,
+                    user.EmailConfirmed,
                     user.IsActive,
                     user.CreatedAt,
                     user.UpdatedAt,

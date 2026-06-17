@@ -28,6 +28,6 @@ export default [
     {
       path: '/',
       name: 'home',
-      component: () => import('@/components/pages/Home.vue'),
+      component: () => import('@/components/pages/home/Home.vue'),
     }
   ]
