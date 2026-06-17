@@ -7,29 +7,34 @@
             <div class="card-body p-4 p-md-5">
               <div class="mb-3">
                 <h1 class="h3 mb-2 auth-title">{{ config.title }}</h1>
-                <p class="text-muted">{{ config.description }}</p>
+                <p v-if="config.description" class="text-muted">{{ config.description }}</p>
               </div>
               <form class="needs-validation" @submit.prevent="handleSubmit">
-                <div
-                  v-for="(field, index) in config.fields"
-                  :key="field.name"
-                  :class="fieldMarginClass(index)"
-                >
-                  <label :for="field.name" class="form-label">{{ field.label }}</label>
+                <template v-for="(field, index) in config.fields" :key="field.name">
                   <input
-                    :id="field.name"
+                    v-if="field.hidden"
                     v-model="form[field.name]"
-                    class="form-control"
-                    :type="field.type ?? 'text'"
-                    :inputmode="field.inputmode ?? 'text'"
-                    :autocomplete="fieldAutocomplete(field)"
-                    :placeholder="field.placeholder ?? `Enter your ${field.label.toLowerCase()}`"
-                    :aria-invalid="!!errors[field.name]"
+                    type="hidden"
+                    :name="field.name"
                   />
-                  <div v-if="errors[field.name]" class="invalid-feedback d-block">
-                    {{ errors[field.name] }}
+                  <div v-else :class="fieldMarginClass(index)">
+                    <label :for="field.name" class="form-label">{{ field.label }}</label>
+                    <input
+                      :id="field.name"
+                      v-model="form[field.name]"
+                      class="form-control"
+                      :type="field.type ?? 'text'"
+                      :inputmode="field.inputmode ?? 'text'"
+                      :autocomplete="fieldAutocomplete(field)"
+                      :placeholder="field.placeholder ?? `Enter your ${field.label.toLowerCase()}`"
+                      :aria-invalid="!!errors[field.name]"
+                      :disabled="field.disabled"
+                    />
+                    <div v-if="errors[field.name]" class="invalid-feedback d-block">
+                      {{ errors[field.name] }}
+                    </div>
                   </div>
-                </div>
+                </template>
                 <div
                   v-if="config.links?.beforeSubmit"
                   class="d-flex justify-content-end mb-4"
@@ -77,6 +82,9 @@ export interface FormFieldConfig {
   autocomplete?: string
   inputmode?: 'text' | 'email' | 'search' | 'tel' | 'url' | 'none' | 'numeric' | 'decimal'
   requiredMessage?: string
+  defaultValue?: string
+  disabled?: boolean
+  hidden?: boolean
 }
 
 export interface FormLinkConfig {
@@ -101,7 +109,9 @@ const props = defineProps<{
 }>()
 
 const form = reactive<Record<string, string>>(
-  Object.fromEntries(props.config.fields.map((field) => [field.name, ''])),
+  Object.fromEntries(
+    props.config.fields.map((field) => [field.name, field.defaultValue ?? '']),
+  ),
 )
 
 const errors = reactive<Record<string, string | undefined>>({})
@@ -116,8 +126,14 @@ function fieldAutocomplete(field: FormFieldConfig): string {
 }
 
 function fieldMarginClass(index: number): string {
-  const isLast = index === props.config.fields.length - 1
-  if (!isLast) return 'mb-3'
+  const field = props.config.fields[index]
+  if (!field || field.hidden) return ''
+
+  const visibleFields = props.config.fields.filter((item) => !item.hidden)
+  const visibleIndex = visibleFields.findIndex((item) => item.name === field.name)
+  const isLastVisible = visibleIndex === visibleFields.length - 1
+
+  if (!isLastVisible) return 'mb-3'
   return props.config.links?.beforeSubmit ? 'mb-2' : 'mb-4'
 }
 
@@ -179,5 +195,10 @@ async function handleSubmit() {
 .auth-link:focus {
   color: $primary;
   text-decoration: underline;
+}
+input:disabled {
+    background-color: $secondary-bg;
+    color: $body-color;
+    cursor: not-allowed;
 }
 </style>
