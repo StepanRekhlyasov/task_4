@@ -73,6 +73,12 @@ builder.Services.AddTransient<IEmailSender<User>, EmailSender>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+    db.Database.Migrate();
+}
+
 app.MapGroup("/api").MapIdentityApi<User>();
 
 if (app.Environment.IsDevelopment())
