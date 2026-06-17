@@ -3,6 +3,7 @@ export default [
       path: '/login',
       name: 'login',
       component: () => import('@/components/pages/Login.vue'),
+      params: { registrationSuccess: 0 },
     },
     {
       path: '/register',

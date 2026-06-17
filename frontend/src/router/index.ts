@@ -6,11 +6,9 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
-  if (to.name === 'login' && from.name === 'home') {
-    next()
-  } else {
-    next()
+router.beforeEach((to, from) => {
+  if (to.name === 'home' && !localStorage.getItem('access_token')) {
+    return '/login'
   }
 })
 

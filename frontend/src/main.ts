@@ -18,5 +18,6 @@ app.use(Vue3Toastify, {
   theme: "colored",
   pauseOnHover: true,
   position: "top-center",
+  clearOnUrlChange: false, 
 })
 app.mount('#app')

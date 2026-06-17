@@ -69,8 +69,10 @@
 import { reactive, ref } from 'vue'
 import { FormLayout } from '@/components'
 import { useAuthStore } from '@/stores/auth'
-import { toast } from 'vue3-toastify'
 import router from '@/router'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 const form = reactive({
     email: '',
@@ -93,7 +95,6 @@ async function onSubmit() {
   try {
     const response = await useAuthStore().login(form.email, form.password)
     if (response.status === 200) {
-      toast.success('Login successful')
       router.push('/')
     }
   } finally {

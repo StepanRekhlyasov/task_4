@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api")]
     public class UsersController : ControllerBase
     {
         private readonly AuthDbContext dbContext;
@@ -15,7 +15,7 @@ namespace backend.Controllers
             this.dbContext = dbContext;
         }
 
-        [HttpGet]
+        [HttpGet("users")]
         [Authorize]
         public IActionResult GetUsers()
         {

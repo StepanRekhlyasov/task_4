@@ -7,7 +7,11 @@ import api from '@/services/api'
 export const useAuthStore = defineStore('auth', () => {
 
   const login = async (email: string, password: string) => {
-    return await api.post('login', { email, password })
+    const response = await api.post('login', { email, password })
+    if (response.status === 200) {
+      localStorage.setItem('access_token', response.data.accessToken)
+    }
+    return response
   }
 
   const logout = () => {

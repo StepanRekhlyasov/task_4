@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Models.Dtos;
 using backend.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
@@ -32,6 +33,12 @@ builder.Services.AddSwaggerGen(options =>
         [new OpenApiSecuritySchemeReference("bearer", document)] = []
     });
 
+    options.ResolveConflictingActions(apiDescriptions =>
+    {
+        return apiDescriptions
+            .OrderBy(d => d.ActionDescriptor.AttributeRouteInfo?.Order ?? 0)
+            .First();
+    });
 });
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
@@ -74,4 +81,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();

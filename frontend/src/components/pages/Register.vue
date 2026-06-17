@@ -106,7 +106,8 @@ async function onSubmit() {
   try {
     const response = await useAuthStore().register(form.name, form.email, form.password)
     if (response.status === 200) {
-      toast.success('Register successful. Check your email for verification.')
+      toast.success('Registration successful. Check your email for verification. You can now login.')
+      router.push({ name: 'login' })
     }
   } finally {
     isSubmitting.value = false
