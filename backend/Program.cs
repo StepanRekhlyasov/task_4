@@ -1,6 +1,7 @@
 using backend.Data;
-using backend.Models.Dtos;
 using backend.Models.Entities;
+using backend.Models.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
@@ -54,13 +55,9 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
 })
 .AddEntityFrameworkStores<AuthDbContext>();
 
-var app = builder.Build();
+builder.Services.AddTransient<IEmailSender<User>, EmailSender>();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    db.Database.Migrate();
-}
+var app = builder.Build();
 
 app.MapGroup("/api").MapIdentityApi<User>();
 
@@ -81,5 +78,4 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
