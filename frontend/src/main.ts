@@ -14,7 +14,7 @@ const pinia = createPinia()
 app.use(pinia)
 app.use(router)
 app.use(Vue3Toastify, {
-  autoClose: 1000,
+  autoClose: 3000,
   theme: "colored",
   pauseOnHover: true,
   position: "top-center",

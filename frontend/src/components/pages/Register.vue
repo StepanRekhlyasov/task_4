@@ -6,9 +6,25 @@
                 <div class="card auth-card shadow-sm">
                 <div class="card-body p-4 p-md-5">
                     <div class="mb-3">
-                    <h1 class="h3 mb-2 auth-title">Sign in</h1>
+                    <h1 class="h3 mb-2 auth-title">Sign up</h1>
                     </div>
                     <form class="needs-validation" @submit.prevent="onSubmit">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input
+                        id="name"
+                        v-model.trim="form.name"
+                        class="form-control"
+                        type="text"
+                        inputmode="text"
+                        autocomplete="name"
+                        placeholder="Enter your name"
+                        :aria-invalid="!!errors.name"
+                        />
+                        <div v-if="errors.name" class="invalid-feedback d-block">
+                            {{ errors.name }}
+                        </div>
+                    </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Login</label>
                         <input
@@ -25,14 +41,14 @@
                             {{ errors.email }}
                         </div>
                     </div>
-                    <div class="mb-2">
+                    <div class="mb-4">
                         <label for="password" class="form-label">Password</label>
                         <input
                         id="password"
                         v-model="form.password"
                         class="form-control"
                         type="password"
-                        autocomplete="current-password"
+                        autocomplete="new-password"
                         placeholder="Enter your password"
                         :aria-invalid="!!errors.password"
                         />
@@ -40,22 +56,17 @@
                             {{ errors.password }}
                         </div>
                     </div>
-                    <div class="d-flex justify-content-end mb-4">
-                        <router-link class="link-secondary auth-link" to="/forgot-password">
-                            Forgot password?
-                        </router-link>
-                    </div>
                     <button class="btn btn-primary w-100" type="submit" :disabled="isSubmitting">
                         <span
                         v-if="isSubmitting"
                         class="spinner-border spinner-border-sm me-2"
                         aria-hidden="true"
                         />
-                        Sign in
+                        Sign up
                     </button>
                     </form>
                     <div class="mt-2 text-center">
-                    <router-link class="ms-2 auth-link" to="/register">Sign up</router-link>
+                    <router-link class="ms-2 auth-link" to="/login">Sign in</router-link>
                     </div>
                 </div>
                 </div>
@@ -73,17 +84,19 @@ import { toast } from 'vue3-toastify'
 import router from '@/router'
 
 const form = reactive({
+    name: '',
     email: '',
     password: '',
 })
 
-const errors = reactive<{ email?: string; password?: string }>({})
+const errors = reactive<{ name?: string; email?: string; password?: string }>({})
 const isSubmitting = ref(false)
 
 function validate() {
+  errors.name = form.name ? undefined : 'Name is required.'
   errors.email = form.email ? undefined : 'Login is required.'
   errors.password = form.password ? undefined : 'Password is required.'
-  return !errors.email && !errors.password
+  return !errors.name && !errors.email && !errors.password
 }
 
 async function onSubmit() {
@@ -91,10 +104,9 @@ async function onSubmit() {
 
   isSubmitting.value = true
   try {
-    const response = await useAuthStore().login(form.email, form.password)
+    const response = await useAuthStore().register(form.name, form.email, form.password)
     if (response.status === 200) {
-      toast.success('Login successful')
-      router.push('/')
+      toast.success('Register successful. Check your email for verification.')
     }
   } finally {
     isSubmitting.value = false

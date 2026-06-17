@@ -5,6 +5,16 @@ export default [
       component: () => import('@/components/pages/Login.vue'),
     },
     {
+      path: '/register',
+      name: 'register',
+      component: () => import('@/components/pages/Register.vue'),
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('@/components/pages/ForgotPassword.vue'),
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/components/pages/NotFound.vue'),

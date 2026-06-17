@@ -1,5 +1,6 @@
 import axios from "axios"
 import { toast } from "vue3-toastify";
+import router from "@/router"
 
 const api = axios.create({
     baseURL: '/api',
@@ -20,10 +21,21 @@ api.interceptors.response.use(response => {
     return response
 },
 error => {
-    if (error.response?.status === 401 && !window.location.pathname.includes('login')) {
-        window.location.href = '/login'
+    if (error.response?.status === 401 && router.currentRoute.value.name !== 'login') {
+        router.push('/login')
     }
-    toast.error(error.message)
+    if (axios.isAxiosError(error)) {
+        const data = error.response?.data;
+        const detail = data?.detail;
+        const errors = data?.errors;
+        if(errors) {
+            Object.values(errors).forEach((error: any) => {
+                toast.error(error)
+            })
+        } else {
+            toast.error(detail)
+        }
+    }
     return Promise.reject(error)
 })
 

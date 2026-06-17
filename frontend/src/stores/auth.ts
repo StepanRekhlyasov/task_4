@@ -1,10 +1,23 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useUsersStore } from './users'
+import router from '@/router'
+import api from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
-  const isAuthenticated = ref(false)
-//   const currentUser = computed(() => useUsersStore().users.find(user => user.id === user.id))
 
-  return { isAuthenticated }
+  const login = async (email: string, password: string) => {
+    return await api.post('login', { email, password })
+  }
+
+  const logout = () => {
+    localStorage.removeItem('access_token')
+    router.push('/login')
+  }
+
+  const register = async (name: string, email: string, password: string) => {
+    return await api.post('register', { name, email, password })
+  }
+
+  return { login, logout, register }
 })

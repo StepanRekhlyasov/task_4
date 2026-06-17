@@ -12,44 +12,44 @@
                     <div class="mb-3">
                         <label for="email" class="form-label">Login</label>
                         <input
-                        id="email"
-                        v-model.trim="form.email"
-                        class="form-control"
-                        type="email"
-                        inputmode="text"
-                        autocomplete="username"
-                        placeholder="Enter your email"
-                        :aria-invalid="!!errors.email"
+                          id="email"
+                          v-model.trim="form.email"
+                          class="form-control"
+                          type="email"
+                          inputmode="text"
+                          autocomplete="username"
+                          placeholder="Enter your email"
+                          :aria-invalid="!!errors.email"
                         />
                         <div v-if="errors.email" class="invalid-feedback d-block">
-                            {{ errors.email }}
+                          {{ errors.email }}
                         </div>
                     </div>
                     <div class="mb-2">
                         <label for="password" class="form-label">Password</label>
                         <input
-                        id="password"
-                        v-model="form.password"
-                        class="form-control"
-                        type="password"
-                        autocomplete="current-password"
-                        placeholder="Enter your password"
-                        :aria-invalid="!!errors.password"
+                          id="password"
+                          v-model="form.password"
+                          class="form-control"
+                          type="password"
+                          autocomplete="current-password"
+                          placeholder="Enter your password"
+                          :aria-invalid="!!errors.password"
                         />
                         <div v-if="errors.password" class="invalid-feedback d-block">
-                            {{ errors.password }}
+                        {{ errors.password }}
                         </div>
                     </div>
                     <div class="d-flex justify-content-end mb-4">
                         <router-link class="link-secondary auth-link" to="/forgot-password">
-                            Forgot password?
+                        Forgot password?
                         </router-link>
                     </div>
                     <button class="btn btn-primary w-100" type="submit" :disabled="isSubmitting">
                         <span
-                        v-if="isSubmitting"
-                        class="spinner-border spinner-border-sm me-2"
-                        aria-hidden="true"
+                          v-if="isSubmitting"
+                          class="spinner-border spinner-border-sm me-2"
+                          aria-hidden="true"
                         />
                         Sign in
                     </button>
@@ -69,8 +69,6 @@
 import { reactive, ref } from 'vue'
 import { FormLayout } from '@/components'
 import { useAuthStore } from '@/stores/auth'
-import { toast } from 'vue3-toastify'
-import router from '@/router'
 
 const form = reactive({
     email: '',
@@ -90,15 +88,9 @@ async function onSubmit() {
   if (!validate()) return
 
   isSubmitting.value = true
-  try {
-    const response = await useAuthStore().login(form.email, form.password)
-    if (response.status === 200) {
-      toast.success('Login successful')
-      router.push('/')
-    }
-  } finally {
-    isSubmitting.value = false
-  }
+  const response = await useAuthStore().login(form.email, form.password)
+  console.log(response)
+  isSubmitting.value = false
 }
 </script>
 
