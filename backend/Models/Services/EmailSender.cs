@@ -7,6 +7,10 @@ namespace backend.Models.Services;
 
 public class EmailSender(IConfiguration configuration) : IEmailSender<User>
 {
+    private readonly IConfiguration configuration = configuration;
+    private readonly string publicUrl = configuration["App:PublicUrl"]
+        ?? throw new InvalidOperationException("App:PublicUrl is not configured.");
+
     public Task SendConfirmationLinkAsync(User user, string email, string confirmationLink) =>
         SendEmailAsync(
             email,
@@ -23,7 +27,7 @@ public class EmailSender(IConfiguration configuration) : IEmailSender<User>
         SendEmailAsync(
             email,
             "Your password reset code",
-            $"{user.Name}, your reset code is: <b>{WebUtility.HtmlEncode(resetCode)}</b>");
+            $"{user.Name}, please reset your password by <a href='{publicUrl}/reset-password?resetCode={WebUtility.HtmlEncode(resetCode)}&email={WebUtility.HtmlEncode(email)}'>clicking here</a>");
 
     private async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {

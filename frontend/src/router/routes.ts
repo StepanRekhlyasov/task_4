@@ -16,6 +16,11 @@ export default [
       component: () => import('@/components/pages/ForgotPassword.vue'),
     },
     {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: () => import('@/components/pages/ResetPassword.vue'),
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/components/pages/NotFound.vue'),
