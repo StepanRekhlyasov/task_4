@@ -1,5 +1,6 @@
 using backend.Authorization;
 using backend.Data;
+using backend.Middleware;
 using backend.Models.Entities;
 using backend.Models.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -96,6 +97,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<LastActivityMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
