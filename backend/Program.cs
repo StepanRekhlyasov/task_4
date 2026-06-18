@@ -55,7 +55,7 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
-    options.Lockout.MaxFailedAccessAttempts = 0; 
+    options.Lockout.MaxFailedAccessAttempts = 999; 
 })
 .AddEntityFrameworkStores<AuthDbContext>();
 
